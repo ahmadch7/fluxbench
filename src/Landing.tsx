@@ -102,7 +102,12 @@ export default function Landing({ onEnter }: { onEnter: () => void }) {
               <CircuitBoard size={16} />
             </span>
           </div>
-          <span className="w-6 sm:w-10" aria-hidden="true" />
+          <span className="hidden px-2 font-serif italic text-base font-semibold tracking-tight text-[#f5f5f0] sm:block">
+            Fluxbench
+          </span>
+          <span className="mr-1 hidden items-center rounded-full border border-white/10 px-2 py-0.5 text-[9px] font-mono text-zinc-500 sm:inline-flex">
+            v2.1
+          </span>
           <a
             href="https://github.com/ahmadch7/Pin-reference"
             target="_blank"

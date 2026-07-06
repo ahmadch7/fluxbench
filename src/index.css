@@ -179,6 +179,29 @@ body {
 .driver-popover-arrow-side-left.driver-popover-arrow { border-left-color: #0e0e11 !important; }
 .driver-popover-arrow-side-right.driver-popover-arrow { border-right-color: #0e0e11 !important; }
 
+/* ===================== Datasheet spec tiles ===================== */
+/* Soft tinted cards + colour-coded labels, matching the settings rail. */
+.spec-grid > div {
+  border-radius: 0.8rem !important;
+  border: 1px solid rgba(255, 255, 255, 0.07) !important;
+}
+.spec-grid > div:nth-child(1) { background: linear-gradient(150deg, rgba(234, 88, 12, 0.12), transparent 62%), #0e0e11; }
+.spec-grid > div:nth-child(2) { background: linear-gradient(150deg, rgba(56, 189, 248, 0.10), transparent 62%), #0e0e11; }
+.spec-grid > div:nth-child(3) { background: linear-gradient(150deg, rgba(16, 185, 129, 0.10), transparent 62%), #0e0e11; }
+.spec-grid > div:nth-child(4) { background: linear-gradient(150deg, rgba(167, 139, 250, 0.11), transparent 62%), #0e0e11; }
+.spec-grid > div:nth-child(5) { background: linear-gradient(150deg, rgba(245, 158, 11, 0.10), transparent 62%), #0e0e11; }
+.spec-grid > div:nth-child(6) { background: linear-gradient(150deg, rgba(244, 114, 182, 0.10), transparent 62%), #0e0e11; }
+.spec-grid > div:nth-child(7) { background: linear-gradient(150deg, rgba(99, 102, 241, 0.11), transparent 62%), #0e0e11; }
+.spec-grid > div:nth-child(8) { background: linear-gradient(150deg, rgba(20, 184, 166, 0.10), transparent 62%), #0e0e11; }
+.spec-grid > div:nth-child(1) > div:first-child { color: #fb923c !important; }
+.spec-grid > div:nth-child(2) > div:first-child { color: #38bdf8 !important; }
+.spec-grid > div:nth-child(3) > div:first-child { color: #34d399 !important; }
+.spec-grid > div:nth-child(4) > div:first-child { color: #a78bfa !important; }
+.spec-grid > div:nth-child(5) > div:first-child { color: #fbbf24 !important; }
+.spec-grid > div:nth-child(6) > div:first-child { color: #f472b6 !important; }
+.spec-grid > div:nth-child(7) > div:first-child { color: #818cf8 !important; }
+.spec-grid > div:nth-child(8) > div:first-child { color: #2dd4bf !important; }
+
 /* Custom scrollbar styling for clean dark interface */
 ::-webkit-scrollbar {
   width: 6px;

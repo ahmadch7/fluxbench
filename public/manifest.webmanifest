@@ -1,6 +1,6 @@
 {
-  "name": "Pin-Reference — Microcontroller Companion",
-  "short_name": "Pin-Reference",
+  "name": "Fluxbench — Microcontroller Companion",
+  "short_name": "Fluxbench",
   "description": "Interactive microcontroller pinout reference, wiring planner, code generator, and in-browser flash/serial — works offline.",
   "start_url": "/",
   "scope": "/",

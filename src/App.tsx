@@ -2309,9 +2309,10 @@ export default function App({ onGoHome }: { onGoHome?: () => void } = {}) {
             <div className="w-9 h-9 rounded-lg bg-orange-600 flex items-center justify-center text-white shadow-[0_0_18px_rgba(234,88,12,0.35)]" id="app_icon">
               <CircuitBoard size={19} />
             </div>
-            <p className="hidden sm:block text-[10px] text-zinc-400 font-mono tracking-[0.22em] uppercase leading-tight">
-              Microcontroller<br />Companion
-            </p>
+            <div className="hidden sm:block leading-none">
+              <div className="font-serif italic text-lg tracking-tight text-[#f5f5f0]">Fluxbench</div>
+              <div className="mt-0.5 text-[9px] text-zinc-500 font-mono tracking-[0.2em] uppercase">Microcontroller Companion</div>
+            </div>
           </div>
         </div>
 
@@ -2342,7 +2343,7 @@ export default function App({ onGoHome }: { onGoHome?: () => void } = {}) {
             onClick={() => setPlannerOpen((v) => !v)}
             className={`relative inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-semibold border transition-all ${plannerOpen
                 ? "bg-orange-600 border-orange-500 text-white"
-                : "bg-[#141416] border-[#2a2a2e] text-zinc-300 hover:text-white hover:border-zinc-600"
+                : "bg-orange-500/10 border-orange-500/25 text-orange-200 hover:bg-orange-500/20 hover:text-white"
               }`}
             id="pin-planner-toggle"
             title="Plan pin assignments and catch conflicts before wiring"
@@ -2361,7 +2362,7 @@ export default function App({ onGoHome }: { onGoHome?: () => void } = {}) {
             onClick={() => setCodeGenOpen((v) => !v)}
             className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-semibold border transition-all ${codeGenOpen
                 ? "bg-indigo-600 border-indigo-500 text-white"
-                : "bg-[#141416] border-[#2a2a2e] text-zinc-300 hover:text-white hover:border-zinc-600"
+                : "bg-indigo-500/10 border-indigo-500/25 text-indigo-200 hover:bg-indigo-500/20 hover:text-white"
               }`}
             id="codegen-toggle"
             title="Generate I2C / SPI / UART init code with this board's real pins"
@@ -2375,7 +2376,7 @@ export default function App({ onGoHome }: { onGoHome?: () => void } = {}) {
             onClick={() => setWiringOpen((v) => !v)}
             className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-semibold border transition-all ${wiringOpen
                 ? "bg-rose-600 border-rose-500 text-white"
-                : "bg-[#141416] border-[#2a2a2e] text-zinc-300 hover:text-white hover:border-zinc-600"
+                : "bg-rose-500/10 border-rose-500/25 text-rose-200 hover:bg-rose-500/20 hover:text-white"
               }`}
             id="wiring-toggle"
             title="Wire a sensor/module to this board with a voltage-safety check"
@@ -2389,7 +2390,7 @@ export default function App({ onGoHome }: { onGoHome?: () => void } = {}) {
             onClick={() => setCompareOpen((v) => !v)}
             className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-semibold border transition-all ${compareOpen
                 ? "bg-amber-600 border-amber-500 text-white"
-                : "bg-[#141416] border-[#2a2a2e] text-zinc-300 hover:text-white hover:border-zinc-600"
+                : "bg-amber-500/10 border-amber-500/25 text-amber-200 hover:bg-amber-500/20 hover:text-white"
               }`}
             id="compare-toggle"
             title="Compare boards side by side"
@@ -2403,7 +2404,7 @@ export default function App({ onGoHome }: { onGoHome?: () => void } = {}) {
             onClick={() => setDiagOpen((v) => !v)}
             className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-semibold border transition-all ${diagOpen
                 ? "bg-teal-600 border-teal-500 text-white"
-                : "bg-[#141416] border-[#2a2a2e] text-zinc-300 hover:text-white hover:border-zinc-600"
+                : "bg-teal-500/10 border-teal-500/25 text-teal-200 hover:bg-teal-500/20 hover:text-white"
               }`}
             id="diagnose-toggle"
             title="1-click hardware test: blink the LED and scan the I2C bus"
@@ -2417,7 +2418,7 @@ export default function App({ onGoHome }: { onGoHome?: () => void } = {}) {
             onClick={() => setFlashOpen((v) => !v)}
             className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-semibold border transition-all ${flashOpen
                 ? "bg-emerald-600 border-emerald-500 text-white"
-                : "bg-[#141416] border-[#2a2a2e] text-zinc-300 hover:text-white hover:border-zinc-600"
+                : "bg-emerald-500/10 border-emerald-500/25 text-emerald-200 hover:bg-emerald-500/20 hover:text-white"
               }`}
             id="flash-monitor-toggle"
             title="Compile, upload, and watch the serial monitor without leaving this page"
@@ -3966,7 +3967,7 @@ export default function App({ onGoHome }: { onGoHome?: () => void } = {}) {
               <FileText size={13} className="text-orange-500" /> Datasheet Specifications (Real-Time Extract)
             </h3>
 
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-xs">
+            <div className="spec-grid grid grid-cols-2 md:grid-cols-4 gap-4 text-xs">
               <div className="bg-[#141416] p-3 rounded-xl border border-zinc-800/40">
                 <div className="text-zinc-500 font-mono text-[9px] uppercase tracking-widest mb-1">Architecture</div>
                 <div className="text-[#f5f5f0] font-semibold">{activeBoard.specs.architecture}</div>
