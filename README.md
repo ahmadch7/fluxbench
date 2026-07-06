@@ -1,8 +1,8 @@
-# Pin-Reference
+# Fluxbench
 
 **An interactive microcontroller pinout and datasheet companion — with live Arduino IDE / USB board detection.**
 
-Pin-Reference puts a development board's physical pinout, key specifications, default
+Fluxbench puts a development board's physical pinout, key specifications, default
 peripheral buses, and silicon gotchas in one place, so you can plan wiring without
 juggling a dozen datasheet PDFs. It also detects the board plugged into your USB port
 and shows its pinout automatically.
