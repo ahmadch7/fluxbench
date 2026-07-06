@@ -109,7 +109,7 @@ export default function Landing({ onEnter }: { onEnter: () => void }) {
             v2.1
           </span>
           <a
-            href="https://github.com/ahmadch7/Pin-reference"
+            href="https://github.com/ahmadch7/fluxbench"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-1 rounded-full border border-white/12 bg-white/5 px-4 py-1.5 text-sm font-medium text-zinc-200 transition-colors hover:bg-white/10 hover:text-white"
