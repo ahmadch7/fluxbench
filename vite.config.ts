@@ -12,6 +12,10 @@ export default defineConfig(() => {
       },
     },
     server: {
+      // Allow the app to be served through an ngrok tunnel. A leading dot
+      // whitelists every subdomain, so it keeps working when ngrok hands out
+      // a new random hostname on each restart (free tier).
+      allowedHosts: ['.ngrok-free.dev', '.ngrok-free.app', '.ngrok.io'],
       // HMR is disabled in AI Studio via DISABLE_HMR env var.
       // Do not modifyâfile watching is disabled to prevent flickering during agent edits.
       hmr: process.env.DISABLE_HMR !== 'true',
