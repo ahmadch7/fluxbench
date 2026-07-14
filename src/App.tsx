@@ -1408,6 +1408,14 @@ export default function App({ onGoHome }: { onGoHome?: () => void } = {}) {
   const [arduinoStatus, setArduinoStatus] = useState<ArduinoStatus | null>(null);
   const [lastAppliedFqbn, setLastAppliedFqbn] = useState<string | null>(null);
   const [syncReachable, setSyncReachable] = useState<boolean>(true);
+  // USB board detection depends on a local companion process (arduino-cli +
+  // reading the Arduino IDE's local app state). That only works when this
+  // page is served BY that same local server. When Fluxbench is loaded from
+  // the public deployment, /api/arduino/board can never succeed - that's not
+  // a transient outage, it is architecturally impossible over the internet.
+  const isLocalRuntime =
+    typeof window !== "undefined" &&
+    (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1");
 
   // Calculate current active board
   const activeBoard: MicrocontrollerBoard = (() => {
@@ -2476,7 +2484,13 @@ export default function App({ onGoHome }: { onGoHome?: () => void } = {}) {
               {!syncEnabled ? (
                 <p className="text-[10px] text-zinc-500 leading-relaxed">Auto-detect paused. Flip the switch to track the board plugged into your USB.</p>
               ) : !syncReachable ? (
-                <p className="text-[10px] text-amber-300/80 leading-relaxed">Backend unreachable. Make sure the app is running via <span className="font-mono">npm run dev</span>.</p>
+                <p className="text-[10px] text-amber-300/80 leading-relaxed">
+                  {isLocalRuntime ? (
+                    <>Backend unreachable. Make sure the app is running via <span className="font-mono">npm run dev</span>.</>
+                  ) : (
+                    <>USB detection needs a local companion server - it can't reach your machine from this public site. Clone the repo, run <span className="font-mono">npm run dev</span>, then open <span className="font-mono">http://localhost:3000</span>.</>
+                  )}
+                </p>
               ) : arduinoStatus?.board ? (
                 arduinoStatus.board.identified ? (
                   <div className="space-y-2">
