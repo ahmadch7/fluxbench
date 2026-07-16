@@ -15,6 +15,36 @@ app.use(express.json());
 const PORT = 3000;
 
 /* ------------------------------------------------------------------ *
+ *  COMPANION-MODE CORS
+ *  The public site (fluxbench.vercel.app) can't reach this machine's
+ *  USB — but the visitor's BROWSER can reach this server on localhost.
+ *  So we let the Fluxbench frontend, when served from Vercel, call our
+ *  /api endpoints cross-origin. WHY the allowlist instead of "*": these
+ *  endpoints can compile and flash firmware, so we only trust our own
+ *  production + preview domains — a random website must not be able to
+ *  drive this server from a hidden fetch().
+ * ------------------------------------------------------------------ */
+const ALLOWED_COMPANION_ORIGINS = [
+  /^https:\/\/fluxbench\.vercel\.app$/,
+  /^https:\/\/fluxbench-[a-z0-9-]+\.vercel\.app$/, // Vercel preview/branch deploys
+];
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+  if (origin && ALLOWED_COMPANION_ORIGINS.some((re) => re.test(origin))) {
+    res.setHeader("Access-Control-Allow-Origin", origin);
+    res.setHeader("Vary", "Origin");
+    res.setHeader("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  }
+  // Preflight: answer immediately so POSTs (compile/upload) pass.
+  if (req.method === "OPTIONS") {
+    res.sendStatus(204);
+    return;
+  }
+  next();
+});
+
+/* ------------------------------------------------------------------ *
  *  ARDUINO IDE LIVE BOARD SYNC
  *  Reads the board you currently have selected in Arduino IDE 2.x and
  *  exposes it at GET /api/arduino/board so the website can mirror it.

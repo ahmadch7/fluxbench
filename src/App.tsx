@@ -1321,6 +1321,42 @@ function decodeFlashErrors(output: string): DecodedError[] {
   return out;
 }
 
+/* ------------------------------------------------------------------ *
+ *  COMPANION-SERVER ROUTING
+ *  When this page is served from a public host (fluxbench.vercel.app),
+ *  its own origin has no hardware backend — the cloud can't see your
+ *  USB ports. But browsers treat http://localhost as a trustworthy
+ *  origin even on an HTTPS page, so the page CAN talk to a Fluxbench
+ *  server running on the visitor's own machine. hwFetch() resolves the
+ *  right base once and caches it:
+ *    ""                       -> same origin (npm run dev, or ngrok tunnel)
+ *    "http://localhost:3000"  -> local companion behind a public page
+ * ------------------------------------------------------------------ */
+const COMPANION_BASE = "http://localhost:3000";
+const IS_LOCAL_PAGE = ["localhost", "127.0.0.1"].includes(window.location.hostname);
+let hwBase: string | null = IS_LOCAL_PAGE ? "" : null; // null = not resolved yet
+
+async function hwFetch(path: string, init?: RequestInit): Promise<Response> {
+  if (hwBase !== null) return fetch(hwBase + path, init);
+  // Base unknown (public page). Try same-origin first — this covers ngrok
+  // tunnels, where the real Express server sits behind this very origin.
+  try {
+    const r = await fetch(path, init);
+    const ct = r.headers.get("content-type") || "";
+    if (r.ok && ct.includes("application/json")) {
+      hwBase = "";
+      return r;
+    }
+  } catch {
+    /* same-origin has no hardware API — fall through to the companion */
+  }
+  // Then the local companion: succeeds when the visitor has Fluxbench
+  // running on their machine (CORS on server.ts allowlists this page).
+  const r2 = await fetch(COMPANION_BASE + path, init);
+  if (r2.ok) hwBase = COMPANION_BASE;
+  return r2;
+}
+
 export default function App({ onGoHome }: { onGoHome?: () => void } = {}) {
   const [selectedBoardId, setSelectedBoardId] = useState<string>("esp32-30pin");
   const [customBoard, setCustomBoard] = useState<MicrocontrollerBoard | null>(null);
@@ -1408,6 +1444,9 @@ export default function App({ onGoHome }: { onGoHome?: () => void } = {}) {
   const [arduinoStatus, setArduinoStatus] = useState<ArduinoStatus | null>(null);
   const [lastAppliedFqbn, setLastAppliedFqbn] = useState<string | null>(null);
   const [syncReachable, setSyncReachable] = useState<boolean>(true);
+  // True when hardware calls go through the local companion server rather
+  // than this page's own origin (i.e. public site + local server running).
+  const [companionActive, setCompanionActive] = useState<boolean>(false);
 
   // Calculate current active board
   const activeBoard: MicrocontrollerBoard = (() => {
@@ -1547,13 +1586,17 @@ export default function App({ onGoHome }: { onGoHome?: () => void } = {}) {
     let timer: ReturnType<typeof setTimeout>;
     const poll = async () => {
       try {
-        const r = await fetch("/api/arduino/board");
+        const r = await hwFetch("/api/arduino/board");
         const d = await r.json();
         if (!active) return;
         setSyncReachable(true);
+        setCompanionActive(hwBase === COMPANION_BASE);
         if (d && d.ok) setArduinoStatus(d as ArduinoStatus);
       } catch {
-        if (active) setSyncReachable(false);
+        if (active) {
+          setSyncReachable(false);
+          setCompanionActive(false);
+        }
       } finally {
         if (active) timer = setTimeout(poll, 800);
       }
@@ -2053,7 +2096,7 @@ export default function App({ onGoHome }: { onGoHome?: () => void } = {}) {
   // Pull the list of recent sketches when the panel opens.
   useEffect(() => {
     if (!flashOpen) return;
-    fetch("/api/arduino/sketches")
+    hwFetch("/api/arduino/sketches")
       .then((r) => r.json())
       .then((d) => {
         if (d?.ok) {
@@ -2128,7 +2171,7 @@ export default function App({ onGoHome }: { onGoHome?: () => void } = {}) {
         fqbn: arduinoStatus?.board?.fqbn || undefined,
         port: arduinoStatus?.board?.port || undefined,
       };
-      const r = await fetch(`/api/arduino/${upload ? "upload" : "compile"}`, {
+      const r = await hwFetch(`/api/arduino/${upload ? "upload" : "compile"}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
@@ -2158,7 +2201,7 @@ export default function App({ onGoHome }: { onGoHome?: () => void } = {}) {
         fqbn: arduinoStatus?.board?.fqbn || undefined,
         port: arduinoStatus?.board?.port || undefined,
       };
-      const r = await fetch("/api/arduino/diagnostic", {
+      const r = await hwFetch("/api/arduino/diagnostic", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
@@ -2476,7 +2519,23 @@ export default function App({ onGoHome }: { onGoHome?: () => void } = {}) {
               {!syncEnabled ? (
                 <p className="text-[10px] text-zinc-500 leading-relaxed">Auto-detect paused. Flip the switch to track the board plugged into your USB.</p>
               ) : !syncReachable ? (
-                <p className="text-[10px] text-amber-300/80 leading-relaxed">Backend unreachable. Make sure the app is running via <span className="font-mono">npm run dev</span>.</p>
+                IS_LOCAL_PAGE ? (
+                  <p className="text-[10px] text-amber-300/80 leading-relaxed">Backend unreachable. Make sure the app is running via <span className="font-mono">npm run dev</span>.</p>
+                ) : (
+                  // Public page, no local companion found: tell the visitor
+                  // exactly how to light this up — with a recovery path, not
+                  // just a dead end.
+                  <div className="space-y-2">
+                    <p className="text-[10px] text-amber-300/80 leading-relaxed">
+                      Looking for Fluxbench on <span className="font-mono">localhost:3000</span>… USB lives on your machine, so this page pairs with a local copy when one is running.
+                    </p>
+                    <div className="rounded-lg bg-black/40 border border-white/8 px-2.5 py-2 space-y-1">
+                      <p className="text-[9px] font-mono text-zinc-400 select-all">git clone github.com/ahmadch7/fluxbench</p>
+                      <p className="text-[9px] font-mono text-zinc-400 select-all">npm install && npm run dev</p>
+                    </div>
+                    <p className="text-[9px] text-zinc-500 leading-relaxed">Keep this tab open — it reconnects by itself. Everything else on this page works without it.</p>
+                  </div>
+                )
               ) : arduinoStatus?.board ? (
                 arduinoStatus.board.identified ? (
                   <div className="space-y-2">
@@ -2490,6 +2549,11 @@ export default function App({ onGoHome }: { onGoHome?: () => void } = {}) {
                       <span className="text-[9px] font-mono text-emerald-400 uppercase tracking-wider">
                         Connected · {arduinoStatus.board.port}
                       </span>
+                      {companionActive && (
+                        <span className="ml-auto rounded-full border border-sky-500/25 bg-sky-500/10 px-1.5 py-px text-[8px] font-mono uppercase tracking-wider text-sky-300" title="This public page is paired with the Fluxbench server running on your machine">
+                          local pair
+                        </span>
+                      )}
                     </div>
                   </div>
                 ) : (
@@ -3074,7 +3138,7 @@ export default function App({ onGoHome }: { onGoHome?: () => void } = {}) {
                 </select>
                 <button
                   onClick={() =>
-                    fetch("/api/arduino/sketches")
+                    hwFetch("/api/arduino/sketches")
                       .then((r) => r.json())
                       .then((d) => d?.ok && setSketches(d.sketches || []))
                       .catch(() => {})
