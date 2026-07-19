@@ -106,7 +106,7 @@ export default function Landing({ onEnter }: { onEnter: () => void }) {
             Fluxbench
           </span>
           <span className="mr-1 hidden items-center rounded-full border border-white/10 px-2 py-0.5 text-[9px] font-mono text-zinc-500 sm:inline-flex">
-            v2.2
+            v2.4
           </span>
           <a
             href="https://github.com/ahmadch7/fluxbench"
