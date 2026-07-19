@@ -35,6 +35,12 @@ app.use((req, res, next) => {
     res.setHeader("Vary", "Origin");
     res.setHeader("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
     res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+    // Chrome Private/Local Network Access: a public HTTPS page reaching into
+    // localhost sends an extra preflight header — without this opt-in Chrome
+    // can silently refuse the connection.
+    if (req.headers["access-control-request-private-network"] === "true") {
+      res.setHeader("Access-Control-Allow-Private-Network", "true");
+    }
   }
   // Preflight: answer immediately so POSTs (compile/upload) pass.
   if (req.method === "OPTIONS") {
